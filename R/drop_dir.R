@@ -96,21 +96,35 @@ drop_dir <- function(
 
   }
 
-  # extract list of content metadata
   results <- content$entries
-
-  # if no limit was given, make additional requests until all content retrieved
+  
   if (is.null(limit)) {
     while (content$has_more) {
-
-      # update content, append results
       content <- drop_list_folder_continue(content$cursor)
-      results  <- append(results, content$entries)
+      results <- append(results, content$entries)
     }
   }
-
-  # coerce to tibble, one row per item found
-  dplyr::bind_rows(purrr::map(results, LinearizeNestedList))
+  
+  flatten_entry <- function(x) {
+    clean_value <- function(v) {
+      # empty list -> NA
+      if (is.list(v) && length(v) == 0) return(NA)
+      # nested structured lists (like sharing_info) -> flatten one level
+      if (is.list(v) && !is.null(names(v))) {
+        return(paste0(
+          names(v), "=", v,
+          collapse = "; "
+        ))
+      }
+      v
+    }
+    x <- purrr::map(x, clean_value)
+    tibble::as_tibble(x)
+  }
+  
+  dplyr::bind_rows(
+    purrr::map(results, flatten_entry)
+  )
 }
 
 
