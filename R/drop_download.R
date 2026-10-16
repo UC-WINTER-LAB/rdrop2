@@ -83,6 +83,30 @@ drop_download <- function(
 }
 
 
+#' Download a Dropbox file into memory
+#'
+#' Returns the response body as a raw vector without writing it to disk.
+#'
+#' @noRd
+drop_download_raw <- function(path, dtoken = get_dropbox_token()) {
+
+  if (!grepl("^(id|rev):", path)) path <- add_slashes(path)
+
+  req <- httr::POST(
+    url = "https://content.dropboxapi.com/2/files/download",
+    httr::config(token = dtoken),
+    httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
+      list(path = path),
+      auto_unbox = TRUE
+    )),
+    httr::write_memory()
+  )
+
+  httr::stop_for_status(req)
+  httr::content(req, as = "raw")
+}
+
+
 #' Downloads a file from Dropbox
 #'
 #' @template path
