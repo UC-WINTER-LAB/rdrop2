@@ -17,6 +17,7 @@ Imports: digest,
          jsonlite,
          magrittr,
          purrr,
+         readr,
          assertthat
 Suggests: testthat,
           uuid
