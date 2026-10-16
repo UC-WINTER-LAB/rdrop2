@@ -2,11 +2,14 @@
 
 #' drop_read_csv
 #'
-#' A lightweight wrapper around \code{read.csv} to read csv files from Dropbox into memory
+#' A lightweight wrapper around [readr::read_csv()] to read CSV files from
+#' Dropbox into memory as a tibble.
 #' @param file Name of file with full path relative to Dropbox root
-#' @param  dest A temporary directory where a csv file is downloaded before being read into memory
-#' @param  ... Additional arguments into \code{read.csv}
+#' @param dest A temporary directory where a CSV file is downloaded before
+#'   being read into memory
+#' @param ... Additional arguments passed to [readr::read_csv()]
 #' @template token
+#' @return A tibble containing the CSV data.
 #' @export
 #' @examples \dontrun{
 #' write.csv(iris, file = "iris.csv")
@@ -15,7 +18,7 @@
 #' new_iris <- drop_read_csv("iris.csv")
 #'}
 drop_read_csv <- function(file, dest = tempdir(), dtoken = get_dropbox_token(), ...) {
-    localfile = paste0(dest, "/", basename(file))
+    localfile <- file.path(dest, basename(file))
     drop_download(file, localfile, overwrite = TRUE, dtoken = dtoken)
-    utils::read.csv(localfile, ...)
+    readr::read_csv(localfile, ...)
 }

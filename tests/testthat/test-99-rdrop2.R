@@ -138,7 +138,7 @@ test_that("drop_read_csv works correctly", {
   write.csv(iris, file = file_name)
   drop_upload(file_name)
   z <- drop_read_csv(file_name)
-  expect_is(z, "data.frame")
+  expect_s3_class(z, "tbl_df")
 
   # cleanup
   unlink(file_name)
